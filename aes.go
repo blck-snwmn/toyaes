@@ -25,26 +25,26 @@ var sbox = []byte{
 	0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16,
 }
 
-func subBytes(input []byte) {
-	for i := 0; i < len(input); i++ {
-		input[i] = sbox[input[i]]
+func subBytes(state []byte) {
+	for i := 0; i < len(state); i++ {
+		state[i] = sbox[state[i]]
 	}
 }
 
-func shiftRows(input []byte) {
+func shiftRows(state []byte) {
 	// 1行目 0-3
 	// no shift
 	// 2行目 4-7
-	shift(input[4:8], 1)
+	shift(state[4:8], 1)
 	// 3行目 8-11
-	shift(input[8:12], 2)
+	shift(state[8:12], 2)
 	// 4行目 12-15
-	shift(input[12:16], 3)
+	shift(state[12:16], 3)
 }
 
-func shift(input []byte, count int) {
+func shift(state []byte, count int) {
 	for i := 0; i < count; i++ {
-		input[3], input[0], input[1], input[2] = input[0], input[1], input[2], input[3]
+		state[3], state[0], state[1], state[2] = state[0], state[1], state[2], state[3]
 	}
 }
 
@@ -73,14 +73,14 @@ func mul(x, y byte) byte {
 
 var tmp = make([]byte, 16)
 
-func mixColumns(input []byte) {
+func mixColumns(state []byte) {
 	// add is xor
 	for i := 0; i < 4; i++ {
-		tmp[i] = mul(0x02, input[i]) ^ mul(0x03, input[i+4]) ^ input[i+8] ^ input[i+12]
-		tmp[i+4] = input[i] ^ mul(0x02, input[i+4]) ^ mul(0x03, input[i+8]) ^ input[i+12]
-		tmp[i+8] = input[i] ^ input[i+4] ^ mul(0x02, input[i+8]) ^ mul(0x03, input[i+12])
-		tmp[i+12] = mul(0x03, input[i]) ^ input[i+4] ^ input[i+8] ^ mul(0x02, input[i+12])
+		tmp[i] = mul(0x02, state[i]) ^ mul(0x03, state[i+4]) ^ state[i+8] ^ state[i+12]
+		tmp[i+4] = state[i] ^ mul(0x02, state[i+4]) ^ mul(0x03, state[i+8]) ^ state[i+12]
+		tmp[i+8] = state[i] ^ state[i+4] ^ mul(0x02, state[i+8]) ^ mul(0x03, state[i+12])
+		tmp[i+12] = mul(0x03, state[i]) ^ state[i+4] ^ state[i+8] ^ mul(0x02, state[i+12])
 	}
-	copy(input, tmp)
+	copy(state, tmp)
 }
 
