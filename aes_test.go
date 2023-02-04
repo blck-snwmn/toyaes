@@ -42,7 +42,8 @@ func Test_mul(t *testing.T) {
 		args args
 		want byte
 	}{
-		{name: "0x56 x 0x83 = c1", args: args{x: 0x57, y: 0x83}, want: 0xc1},
+		{name: "0x57 x 0x83 = c1", args: args{x: 0x57, y: 0x83}, want: 0xc1},
+		{name: "0x57 x 0x13 = f3", args: args{x: 0x57, y: 0x13}, want: 0xfe},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
