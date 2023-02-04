@@ -32,3 +32,23 @@ func Test_shift(t *testing.T) {
 	}
 }
 
+func Test_mul(t *testing.T) {
+	type args struct {
+		x byte
+		y byte
+	}
+	tests := []struct {
+		name string
+		args args
+		want byte
+	}{
+		{name: "0x56 x 0x83 = c1", args: args{x: 0x57, y: 0x83}, want: 0xc1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := mul(tt.args.x, tt.args.y); got != tt.want {
+				t.Errorf("mul() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

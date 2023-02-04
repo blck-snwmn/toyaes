@@ -48,3 +48,25 @@ func shift(input []byte, count int) {
 	}
 }
 
+func add(x, y byte) byte {
+	return x ^ y
+}
+
+// 11011
+// 1b
+
+func mul(x, y byte) byte {
+	sum := byte(0)
+	for i := 0; i < 8; i++ {
+		if y&1 == 1 {
+			sum = add(sum, x)
+		}
+		msb := x & 0x80
+		x <<= 1
+		if msb == 0x80 {
+			x = add(x, 0x1b)
+		}
+		y >>= 1
+	}
+	return sum
+}
