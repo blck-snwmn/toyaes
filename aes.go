@@ -48,9 +48,9 @@ func shift(input []byte, count int) {
 	}
 }
 
-func add(x, y byte) byte {
-	return x ^ y
-}
+// func add(x, y byte) byte {
+// 	return x ^ y
+// }
 
 // 11011
 // 1b
@@ -59,14 +59,28 @@ func mul(x, y byte) byte {
 	sum := byte(0)
 	for i := 0; i < 8; i++ {
 		if y&1 == 1 {
-			sum = add(sum, x)
+			sum ^= x // add
 		}
 		msb := x & 0x80
 		x <<= 1
 		if msb == 0x80 {
-			x = add(x, 0x1b)
+			x ^= 0x1b // add
 		}
 		y >>= 1
 	}
 	return sum
 }
+
+var tmp = make([]byte, 16)
+
+func mixColumns(input []byte) {
+	// add is xor
+	for i := 0; i < 4; i++ {
+		tmp[i] = mul(0x02, input[i]) ^ mul(0x03, input[i+4]) ^ input[i+8] ^ input[i+12]
+		tmp[i+4] = input[i] ^ mul(0x02, input[i+4]) ^ mul(0x03, input[i+8]) ^ input[i+12]
+		tmp[i+8] = input[i] ^ input[i+4] ^ mul(0x02, input[i+8]) ^ mul(0x03, input[i+12])
+		tmp[i+12] = mul(0x03, input[i]) ^ input[i+4] ^ input[i+8] ^ mul(0x02, input[i+12])
+	}
+	copy(input, tmp)
+}
+
