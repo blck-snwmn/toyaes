@@ -30,3 +30,21 @@ func subBytes(input []byte) {
 		input[i] = sbox[input[i]]
 	}
 }
+
+func shiftRows(input []byte) {
+	// 1行目 0-3
+	// no shift
+	// 2行目 4-7
+	shift(input[4:8], 1)
+	// 3行目 8-11
+	shift(input[8:12], 2)
+	// 4行目 12-15
+	shift(input[12:16], 3)
+}
+
+func shift(input []byte, count int) {
+	for i := 0; i < count; i++ {
+		input[3], input[0], input[1], input[2] = input[0], input[1], input[2], input[3]
+	}
+}
+
