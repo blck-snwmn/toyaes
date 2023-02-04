@@ -1,5 +1,7 @@
 package toyaes
 
+import "errors"
+
 // Kb: word number (paintext)
 // Nk: Word number (key)
 // Nr: round number
@@ -84,3 +86,37 @@ func mixColumns(state []byte) {
 	copy(state, tmp)
 }
 
+func addRoundKey(state, word []byte) {
+
+}
+
+const nb = 4
+
+func Cipher(input, out, word []byte) error {
+	if len(input) != 4*nb {
+		return errors.New("invalid length")
+	}
+	if len(out) != 4*nb {
+		return errors.New("invalid length")
+	}
+
+	nr := 10 // AES-126
+
+	state := make([]byte, 16)
+	copy(state, input)
+
+	addRoundKey(state, word[0:nb])
+	for i := 1; i < nr; i++ {
+		subBytes(state)
+		shiftRows(state)
+		mixColumns(state)
+		addRoundKey(state, word[i*nb:(i+1)*nb]) // (i+1)*nb = i*nb + nb
+	}
+	subBytes(state)
+	shiftRows(state)
+	addRoundKey(state, word[nr*nb:(nr+1)*nb]) // (nr+1)*nb = nr*nb + nb
+
+	// result
+	copy(out, state)
+	return nil
+}
