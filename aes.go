@@ -177,7 +177,10 @@ func keyExpansion(key []byte, word []uint32) {
 		tmp := word[i-1]
 		switch {
 		case i%nk == 0:
-			tmp = subWord(rotWord(tmp)) ^ uint32(powx[i/nk])
+			afterRot := rotWord(tmp)
+			afterSub := subWord(afterRot)
+			rcon := (uint32(powx[i/nk-1]) << 24) // TODO ここの計算について再確認
+			tmp = afterSub ^ rcon
 		case nk > 6 && i%nk == 4:
 			tmp = subWord(tmp)
 		default:
