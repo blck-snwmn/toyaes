@@ -117,17 +117,6 @@ func Test_incrementCounter(t *testing.T) {
 	})
 }
 
-func Test_xors(t *testing.T) {
-	// 10100001 00110011
-	// 10111011 10011001
-	r := xors([]byte{0xA1, 0x33}, []byte{0xBB, 0x99})
-	// 00011010 10101010
-	want := []byte{0x1A, 0xAA}
-	if !reflect.DeepEqual(r, want) {
-		t.Errorf("unexpected value. want=%v, got=%v", want, r)
-	}
-}
-
 func Test_enc(t *testing.T) {
 	nonce := []byte{
 		0x00,

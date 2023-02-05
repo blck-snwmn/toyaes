@@ -1,6 +1,7 @@
 package toyaes
 
 import (
+	"crypto/subtle"
 	"encoding/binary"
 )
 
@@ -21,15 +22,6 @@ func incrementCounter(counter [size]byte) [size]byte {
 	binary.BigEndian.PutUint32(c, binary.BigEndian.Uint32(c)+1)
 	copy(counter[size-4:], c)
 	return counter
-}
-
-func xors(l, r []byte) []byte {
-	ll := make([]byte, len(l))
-	copy(ll, l)
-	for i, rv := range r {
-		ll[i] ^= rv
-	}
-	return ll
 }
 
 func enc(plaintext, key, nonce []byte) ([]byte, error) {
@@ -54,7 +46,10 @@ func encWitchCounter(plaintext, key, nonce []byte, c [16]byte) ([]byte, error) {
 
 		var mask [size]byte
 		block.Encrypt(mask[:], c[:])
-		copy(ct[start:end], xors(pt, mask[:]))
+
+		out := make([]byte, len(pt))
+		subtle.XORBytes(out, pt, mask[:])
+		copy(ct[start:end], out)
 
 		c = incrementCounter(c)
 	}
@@ -153,7 +148,8 @@ func Seal(plaintext, key, nonce, additionalData []byte) ([]byte, error) {
 	c := genCounter(nonce)
 	block.Encrypt(encryptedCounter, c[:])
 
-	tags := xors(encryptedCounter[:], xx[:])
+	tags := make([]byte, len(encryptedCounter[:]))
+	subtle.XORBytes(tags, encryptedCounter[:], xx[:])
 
 	ct = append(ct, tags[:]...)
 	return ct, nil
