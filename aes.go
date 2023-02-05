@@ -22,12 +22,6 @@ func shiftRows(state []byte) {
 	state[3], state[7], state[11], state[15] = state[15], state[3], state[7], state[11]
 }
 
-func shift(state []byte, count int) {
-	for i := 0; i < count; i++ {
-		state[3], state[0], state[1], state[2] = state[0], state[1], state[2], state[3]
-	}
-}
-
 func mul(x, y byte) byte {
 	sum := byte(0)
 	for i := 0; i < 8; i++ {
