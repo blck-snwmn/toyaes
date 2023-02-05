@@ -2,7 +2,6 @@ package toyaes
 
 import (
 	"encoding/binary"
-	"errors"
 )
 
 // Kb: word number (paintext)
@@ -89,20 +88,26 @@ func mixColumns(state []byte) {
 	copy(state, tmp)
 }
 
-func addRoundKey(state, word []byte) {
+var addrktmp = make([]byte, 16)
+
+func addRoundKey(state []byte, word []uint32) {
+	binary.BigEndian.PutUint32(addrktmp[0:4], word[0])
+	binary.BigEndian.PutUint32(addrktmp[4:8], word[1])
+	binary.BigEndian.PutUint32(addrktmp[8:12], word[2])
+	binary.BigEndian.PutUint32(addrktmp[12:16], word[3])
 	for i := 0; i < len(state); i++ {
-		state[i] ^= word[i]
+		state[i] ^= addrktmp[i]
 	}
 }
 
 const nb = 4
 
-func Cipher(input, out, word []byte) error {
+func cipher(input, out []byte, word []uint32) {
 	if len(input) != 4*nb {
-		return errors.New("invalid length")
+		panic("invalid length")
 	}
 	if len(out) != 4*nb {
-		return errors.New("invalid length")
+		panic("invalid length")
 	}
 
 	nr := 10 // AES-126
@@ -123,7 +128,6 @@ func Cipher(input, out, word []byte) error {
 
 	// result
 	copy(out, state)
-	return nil
 }
 
 var powx = [16]byte{
@@ -180,4 +184,32 @@ func keyExpansion(key []byte, word []uint32) {
 		}
 		word[i] = word[i-nk] ^ tmp
 	}
+}
+
+type toyAES struct {
+	word []uint32
+}
+
+func NewToyAES(key []byte) *toyAES {
+	nk := len(key) / 4 // 4,6,8
+	var nr int
+	switch nk {
+	case 4:
+		nr = 10
+	case 6:
+		nr = 12
+	case 8:
+		nr = 14
+	default:
+		panic("invalid key length")
+	}
+	word := make([]uint32, nb*(nr+1))
+	keyExpansion(key, word)
+	return &toyAES{
+		word: word,
+	}
+}
+
+func (c *toyAES) Encrypt(dst, src []byte) {
+	cipher(src, dst, c.word)
 }
