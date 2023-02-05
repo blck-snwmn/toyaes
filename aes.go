@@ -93,7 +93,7 @@ func cipher(input, out []byte, word []uint32) {
 		panic("invalid length")
 	}
 
-	nr := 10 // AES-126
+	nr := len(word)/nb - 1
 
 	state := make([]byte, 16)
 	copy(state, input)
@@ -121,7 +121,7 @@ func invCipher(input, out []byte, word []uint32) {
 		panic("invalid length")
 	}
 
-	nr := 10 // AES-126
+	nr := len(word)/nb - 1
 
 	state := make([]byte, 16)
 	copy(state, input)

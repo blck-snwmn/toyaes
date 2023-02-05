@@ -29,7 +29,9 @@ func Test_mul(t *testing.T) {
 	}
 }
 
-func TestGoEncrypt(t *testing.T) {
+func TestGoEncrypt_128bit(t *testing.T) {
+	t.Parallel()
+
 	key := make([]byte, 16)
 	src := make([]byte, 16)
 	for i := 0; i < 1000; i++ {
@@ -49,8 +51,98 @@ func TestGoEncrypt(t *testing.T) {
 	}
 }
 
-func TestGoDecrypt(t *testing.T) {
+func TestGoEncrypt_192bit(t *testing.T) {
+	t.Parallel()
+
+	key := make([]byte, 24)
+	src := make([]byte, 16)
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(src)
+
+		dstgo := make([]byte, 16)
+		gob, _ := aes.NewCipher(key)
+		gob.Encrypt(dstgo, src)
+
+		dstme := make([]byte, 16)
+		NewToyAES(key).Encrypt(dstme, src)
+
+		if !reflect.DeepEqual(dstme, dstgo) {
+			t.Fatalf("got =%X, want=%X\n", dstme, dstgo)
+		}
+	}
+}
+
+func TestGoEncrypt_256bit(t *testing.T) {
+	t.Parallel()
+
+	key := make([]byte, 32)
+	src := make([]byte, 16)
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(src)
+
+		dstgo := make([]byte, 16)
+		gob, _ := aes.NewCipher(key)
+		gob.Encrypt(dstgo, src)
+
+		dstme := make([]byte, 16)
+		NewToyAES(key).Encrypt(dstme, src)
+
+		if !reflect.DeepEqual(dstme, dstgo) {
+			t.Fatalf("got =%X, want=%X\n", dstme, dstgo)
+		}
+	}
+}
+
+func TestGoDecrypt_128bit(t *testing.T) {
+	t.Parallel()
+
 	key := make([]byte, 16)
+	src := make([]byte, 16)
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(src)
+
+		dstgo := make([]byte, 16)
+		gob, _ := aes.NewCipher(key)
+		gob.Decrypt(dstgo, src)
+
+		dstme := make([]byte, 16)
+		NewToyAES(key).Dencrypt(dstme, src)
+
+		if !reflect.DeepEqual(dstme, dstgo) {
+			t.Fatalf("got =%X, want=%X\n", dstme, dstgo)
+		}
+	}
+}
+
+func TestGoDecrypt_192bit(t *testing.T) {
+	t.Parallel()
+
+	key := make([]byte, 24)
+	src := make([]byte, 16)
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(src)
+
+		dstgo := make([]byte, 16)
+		gob, _ := aes.NewCipher(key)
+		gob.Decrypt(dstgo, src)
+
+		dstme := make([]byte, 16)
+		NewToyAES(key).Dencrypt(dstme, src)
+
+		if !reflect.DeepEqual(dstme, dstgo) {
+			t.Fatalf("got =%X, want=%X\n", dstme, dstgo)
+		}
+	}
+}
+
+func TestGoDecrypt_256bit(t *testing.T) {
+	t.Parallel()
+
+	key := make([]byte, 32)
 	src := make([]byte, 16)
 	for i := 0; i < 1000; i++ {
 		rand.Read(key)
