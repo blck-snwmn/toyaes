@@ -142,14 +142,14 @@ func Seal(plaintext, key, nonce, additionalData []byte) ([]byte, error) {
 	hk := make([]byte, 16)
 	block.Encrypt(hk, make([]byte, 16))
 
-	xx := ghash(ct, additionalData, hk)
+	hash := ghash(ct, additionalData, hk)
 
 	encryptedCounter := make([]byte, 16)
 	c := genCounter(nonce)
 	block.Encrypt(encryptedCounter, c[:])
 
 	tags := make([]byte, len(encryptedCounter[:]))
-	subtle.XORBytes(tags, encryptedCounter[:], xx[:])
+	subtle.XORBytes(tags, encryptedCounter[:], hash[:])
 
 	ct = append(ct, tags[:]...)
 	return ct, nil
