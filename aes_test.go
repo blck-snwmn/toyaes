@@ -49,6 +49,26 @@ func TestGoEncrypt(t *testing.T) {
 	}
 }
 
+func TestGoDecrypt(t *testing.T) {
+	key := make([]byte, 16)
+	src := make([]byte, 16)
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(src)
+
+		dstgo := make([]byte, 16)
+		gob, _ := aes.NewCipher(key)
+		gob.Decrypt(dstgo, src)
+
+		dstme := make([]byte, 16)
+		NewToyAES(key).Dencrypt(dstme, src)
+
+		if !reflect.DeepEqual(dstme, dstgo) {
+			t.Fatalf("got =%X, want=%X\n", dstme, dstgo)
+		}
+	}
+}
+
 func Test_keyExpansion_128bit(t *testing.T) {
 	key := []byte{0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}
 	word := make([]uint32, 44)

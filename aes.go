@@ -16,10 +16,22 @@ func subBytes(state []byte) {
 	}
 }
 
+func invSubBytes(state []byte) {
+	for i := 0; i < len(state); i++ {
+		state[i] = isbox[state[i]]
+	}
+}
+
 func shiftRows(state []byte) {
 	state[1], state[5], state[9], state[13] = state[5], state[9], state[13], state[1]
 	state[2], state[6], state[10], state[14] = state[10], state[14], state[2], state[6]
 	state[3], state[7], state[11], state[15] = state[15], state[3], state[7], state[11]
+}
+
+func invShiftRows(state []byte) {
+	state[1], state[5], state[9], state[13] = state[13], state[1], state[5], state[9]
+	state[2], state[6], state[10], state[14] = state[10], state[14], state[2], state[6]
+	state[3], state[7], state[11], state[15] = state[7], state[11], state[15], state[3]
 }
 
 func mul(x, y byte) byte {
@@ -46,6 +58,18 @@ func mixColumns(state []byte) {
 		tmp[i*4+1] = state[i*4] ^ mul(0x02, state[i*4+1]) ^ mul(0x03, state[i*4+2]) ^ state[i*4+3]
 		tmp[i*4+2] = state[i*4] ^ state[i*4+1] ^ mul(0x02, state[i*4+2]) ^ mul(0x03, state[i*4+3])
 		tmp[i*4+3] = mul(0x03, state[i*4]) ^ state[i*4+1] ^ state[i*4+2] ^ mul(0x02, state[i*4+3])
+	}
+	copy(state, tmp)
+}
+
+func invMixColumns(state []byte) {
+	tmp := make([]byte, 16)
+	// add is xor
+	for i := 0; i < 4; i++ {
+		tmp[i*4] = mul(0x0e, state[i*4]) ^ mul(0x0b, state[i*4+1]) ^ mul(0x0d, state[i*4+2]) ^ mul(0x09, state[i*4+3])
+		tmp[i*4+1] = mul(0x09, state[i*4]) ^ mul(0x0e, state[i*4+1]) ^ mul(0x0b, state[i*4+2]) ^ mul(0x0d, state[i*4+3])
+		tmp[i*4+2] = mul(0x0d, state[i*4]) ^ mul(0x09, state[i*4+1]) ^ mul(0x0e, state[i*4+2]) ^ mul(0x0b, state[i*4+3])
+		tmp[i*4+3] = mul(0x0b, state[i*4]) ^ mul(0x0d, state[i*4+1]) ^ mul(0x09, state[i*4+2]) ^ mul(0x0e, state[i*4+3])
 	}
 	copy(state, tmp)
 }
@@ -85,6 +109,33 @@ func cipher(input, out []byte, word []uint32) {
 	shiftRows(state)
 	addRoundKey(state, word[nr*nb:(nr+1)*nb]) // (nr+1)*nb = nr*nb + nb
 
+	// result
+	copy(out, state)
+}
+
+func invCipher(input, out []byte, word []uint32) {
+	if len(input) != 4*nb {
+		panic("invalid length")
+	}
+	if len(out) != 4*nb {
+		panic("invalid length")
+	}
+
+	nr := 10 // AES-126
+
+	state := make([]byte, 16)
+	copy(state, input)
+
+	addRoundKey(state, word[nr*nb:(nr+1)*nb]) // (nr+1)*nb = nr*nb + nb
+	for i := nr - 1; i > 0; i-- {
+		invShiftRows(state)
+		invSubBytes(state)
+		addRoundKey(state, word[i*nb:(i+1)*nb]) // (i+1)*nb = i*nb + nb
+		invMixColumns(state)
+	}
+	invShiftRows(state)
+	invSubBytes(state)
+	addRoundKey(state, word[0:nb])
 	// result
 	copy(out, state)
 }
@@ -154,4 +205,8 @@ func NewToyAES(key []byte) *toyAES {
 
 func (c *toyAES) Encrypt(dst, src []byte) {
 	cipher(src, dst, c.word)
+}
+
+func (c *toyAES) Dencrypt(dst, src []byte) {
+	invCipher(src, dst, c.word)
 }
