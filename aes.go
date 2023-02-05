@@ -85,6 +85,10 @@ func addRoundKey(state []byte, word []uint32) {
 	}
 }
 
+func nr(word []uint32) int {
+	return len(word)/nb - 1
+}
+
 func cipher(input, out []byte, word []uint32) {
 	if len(input) != 4*nb {
 		panic("invalid length")
@@ -93,7 +97,7 @@ func cipher(input, out []byte, word []uint32) {
 		panic("invalid length")
 	}
 
-	nr := len(word)/nb - 1
+	nr := nr(word)
 
 	state := make([]byte, 16)
 	copy(state, input)
@@ -121,7 +125,7 @@ func invCipher(input, out []byte, word []uint32) {
 		panic("invalid length")
 	}
 
-	nr := len(word)/nb - 1
+	nr := nr(word)
 
 	state := make([]byte, 16)
 	copy(state, input)
@@ -154,15 +158,7 @@ func keyExpansion(key []byte, word []uint32) {
 	for i := 0; i < nk; i++ {
 		word[i] = binary.BigEndian.Uint32(key[4*i : 4*(i+1)])
 	}
-	var nr int
-	switch nk {
-	case 4:
-		nr = 10
-	case 6:
-		nr = 12
-	case 8:
-		nr = 14
-	}
+	nr := nr(word)
 	for i := nk; i < nb*(nr+1); i++ {
 		tmp := word[i-1]
 		switch {
