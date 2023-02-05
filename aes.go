@@ -44,9 +44,8 @@ func mul(x, y byte) byte {
 	return sum
 }
 
-var tmp = make([]byte, 16)
-
 func mixColumns(state []byte) {
+	tmp := make([]byte, 16)
 	// add is xor
 	for i := 0; i < 4; i++ {
 		tmp[i*4] = mul(0x02, state[i*4]) ^ mul(0x03, state[i*4+1]) ^ state[i*4+2] ^ state[i*4+3]
@@ -57,9 +56,8 @@ func mixColumns(state []byte) {
 	copy(state, tmp)
 }
 
-var addrktmp = make([]byte, 16)
-
 func addRoundKey(state []byte, word []uint32) {
+	addrktmp := make([]byte, 16)
 	binary.BigEndian.PutUint32(addrktmp[0:4], word[0])
 	binary.BigEndian.PutUint32(addrktmp[4:8], word[1])
 	binary.BigEndian.PutUint32(addrktmp[8:12], word[2])
@@ -68,8 +66,6 @@ func addRoundKey(state []byte, word []uint32) {
 		state[i] ^= addrktmp[i]
 	}
 }
-
-const nb = 4
 
 func cipher(input, out []byte, word []uint32) {
 	if len(input) != 4*nb {
@@ -99,30 +95,10 @@ func cipher(input, out []byte, word []uint32) {
 	copy(out, state)
 }
 
-var powx = [16]byte{
-	0x01,
-	0x02,
-	0x04,
-	0x08,
-	0x10,
-	0x20,
-	0x40,
-	0x80,
-	0x1b,
-	0x36,
-	0x6c,
-	0xd8,
-	0xab,
-	0x4d,
-	0x9a,
-	0x2f,
-}
-
 func rotWord(w uint32) uint32 { return w<<8 | w>>24 }
 
-var sbwtmp = make([]byte, 4)
-
 func subWord(w uint32) uint32 {
+	sbwtmp := make([]byte, 4)
 	binary.BigEndian.PutUint32(sbwtmp, w)
 	subBytes(sbwtmp)
 	return binary.BigEndian.Uint32(sbwtmp)
