@@ -1,0 +1,19 @@
+name: Go test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: go test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.mod"
+          cache: true
+      - name: Run test
+        run: |
+          go test ./...
