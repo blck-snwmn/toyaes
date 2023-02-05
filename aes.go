@@ -75,10 +75,10 @@ var tmp = make([]byte, 16)
 func mixColumns(state []byte) {
 	// add is xor
 	for i := 0; i < 4; i++ {
-		tmp[i] = mul(0x02, state[i]) ^ mul(0x03, state[i+4]) ^ state[i+8] ^ state[i+12]
-		tmp[i+4] = state[i] ^ mul(0x02, state[i+4]) ^ mul(0x03, state[i+8]) ^ state[i+12]
-		tmp[i+8] = state[i] ^ state[i+4] ^ mul(0x02, state[i+8]) ^ mul(0x03, state[i+12])
-		tmp[i+12] = mul(0x03, state[i]) ^ state[i+4] ^ state[i+8] ^ mul(0x02, state[i+12])
+		tmp[i*4] = mul(0x02, state[i*4]) ^ mul(0x03, state[i*4+1]) ^ state[i*4+2] ^ state[i*4+3]
+		tmp[i*4+1] = state[i*4] ^ mul(0x02, state[i*4+1]) ^ mul(0x03, state[i*4+2]) ^ state[i*4+3]
+		tmp[i*4+2] = state[i*4] ^ state[i*4+1] ^ mul(0x02, state[i*4+2]) ^ mul(0x03, state[i*4+3])
+		tmp[i*4+3] = mul(0x03, state[i*4]) ^ state[i*4+1] ^ state[i*4+2] ^ mul(0x02, state[i*4+3])
 	}
 	copy(state, tmp)
 }
