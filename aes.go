@@ -1,6 +1,9 @@
 package toyaes
 
-import "errors"
+import (
+	"encoding/binary"
+	"errors"
+)
 
 // Kb: word number (paintext)
 // Nk: Word number (key)
@@ -87,7 +90,9 @@ func mixColumns(state []byte) {
 }
 
 func addRoundKey(state, word []byte) {
-
+	for i := 0; i < len(state); i++ {
+		state[i] ^= word[i]
+	}
 }
 
 const nb = 4
@@ -119,4 +124,60 @@ func Cipher(input, out, word []byte) error {
 	// result
 	copy(out, state)
 	return nil
+}
+
+var powx = [16]byte{
+	0x01,
+	0x02,
+	0x04,
+	0x08,
+	0x10,
+	0x20,
+	0x40,
+	0x80,
+	0x1b,
+	0x36,
+	0x6c,
+	0xd8,
+	0xab,
+	0x4d,
+	0x9a,
+	0x2f,
+}
+
+func rotWord(w uint32) uint32 { return w<<8 | w>>24 }
+
+var sbwtmp = make([]byte, 4)
+
+func subWord(w uint32) uint32 {
+	binary.BigEndian.PutUint32(sbwtmp, w)
+	subBytes(sbwtmp)
+	return binary.BigEndian.Uint32(sbwtmp)
+}
+
+func keyExpansion(key []byte, word []uint32) {
+	nk := len(key) / 4 // 4,6,8
+	for i := 0; i < nk; i++ {
+		word[i] = binary.BigEndian.Uint32(key[4*i : 4*(i+1)])
+	}
+	var nr int
+	switch nk {
+	case 4:
+		nr = 10
+	case 6:
+		nr = 12
+	case 8:
+		nr = 14
+	}
+	for i := nk; i < nb*(nr+1); i++ {
+		tmp := word[i-1]
+		switch {
+		case i%nk == 0:
+			tmp = subWord(rotWord(tmp)) ^ uint32(powx[i/nk])
+		case nk > 6 && i%nk == 4:
+			tmp = subWord(tmp)
+		default:
+		}
+		word[i] = word[i-nk] ^ tmp
+	}
 }
