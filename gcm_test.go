@@ -283,3 +283,30 @@ func TestSeal(t *testing.T) {
 		}
 	}
 }
+
+func TestOpen(t *testing.T) {
+	var (
+		key            = make([]byte, 32)
+		plaintext      = make([]byte, 32)
+		nonce          = make([]byte, 12)
+		additionalData = make([]byte, 12)
+	)
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(plaintext)
+		rand.Read(nonce)
+		rand.Read(additionalData)
+
+		got, err := Seal(plaintext, key, nonce, additionalData)
+		if err != nil {
+			t.Fatalf("err=%+v", err)
+		}
+		p, err := Open(got, key, nonce, additionalData)
+		if err != nil {
+			t.Fatalf("err=%+v", err)
+		}
+		if !reflect.DeepEqual(p, plaintext) {
+			t.Fatalf("got =%X, want=%X\n", p, plaintext)
+		}
+	}
+}

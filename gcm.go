@@ -3,6 +3,7 @@ package toyaes
 import (
 	"crypto/subtle"
 	"encoding/binary"
+	"errors"
 )
 
 const size = 16
@@ -152,5 +153,36 @@ func Seal(plaintext, key, nonce, additionalData []byte) ([]byte, error) {
 	subtle.XORBytes(tags, encryptedCounter[:], hash[:])
 
 	ct = append(ct, tags[:]...)
+	return ct, nil
+}
+
+func Open(ciphertext, key, nonce, additionalData []byte) ([]byte, error) {
+
+	tags := ciphertext[len(ciphertext)-16:]
+	ciphertext = ciphertext[:len(ciphertext)-16]
+
+	block := NewToyAES(key)
+	hk := make([]byte, 16)
+	block.Encrypt(hk, make([]byte, 16))
+
+	hash := ghash(ciphertext, additionalData, hk)
+
+	encryptedCounter := make([]byte, 16)
+	c := genCounter(nonce)
+	block.Encrypt(encryptedCounter, c[:])
+
+	expectedTags := make([]byte, len(encryptedCounter[:]))
+	subtle.XORBytes(expectedTags, encryptedCounter[:], hash[:])
+
+	if subtle.ConstantTimeCompare(expectedTags, tags) != 1 {
+		return nil, errors.New("invalid tags")
+	}
+
+	counter := incrementCounter(genCounter(nonce))
+	ct, err := encWitchCounter(ciphertext, key, nonce, counter)
+	if err != nil {
+		return nil, err
+	}
+
 	return ct, nil
 }
