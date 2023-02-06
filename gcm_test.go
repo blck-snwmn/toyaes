@@ -134,8 +134,8 @@ func Test_enc(t *testing.T) {
 	}
 	plaintext := []byte("sample text. this text is test text.")
 	key, _ := hex.DecodeString("000102030405060708090A0B0C0E0F101112131415161718191A1B1C1E1F2021")
-	gcm := &toyAESGCM{cipher: NewToyAES(key), key: key}
-	ct := gcm.enc(plaintext, nonce)
+	gcm := NewAESGCM(key)
+	ct := gcm.(*toyAESGCM).enc(plaintext, nonce)
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -170,8 +170,8 @@ func Test_encWitchCounter(t *testing.T) {
 	cc := genCounter(nonce)
 	incrementCounter(cc)
 
-	gcm := &toyAESGCM{cipher: NewToyAES(key), key: key}
-	ct := gcm.encWitchCounter(plaintext, nonce, cc)
+	gcm := NewAESGCM(key)
+	ct := gcm.(*toyAESGCM).encWitchCounter(plaintext, nonce, cc)
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
