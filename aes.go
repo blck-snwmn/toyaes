@@ -1,7 +1,6 @@
 package toyaes
 
 import (
-	"crypto/aes"
 	ccipher "crypto/cipher"
 	"encoding/binary"
 )
@@ -187,7 +186,6 @@ type toyAES struct {
 func (*toyAES) BlockSize() int { return 16 }
 
 func NewToyAES(key []byte) *toyAES {
-	aes.NewCipher(nil)
 	nk := len(key) / 4 // 4,6,8
 	var nr int
 	switch nk {
