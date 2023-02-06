@@ -87,8 +87,7 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 	}), h)
 
 	var hashed [16]byte
-	binary.BigEndian.PutUint64(hashed[:8], x.lhs)
-	binary.BigEndian.PutUint64(hashed[8:], x.rhs)
+	pubUint128(hashed[:], x)
 	return hashed
 }
 

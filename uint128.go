@@ -5,6 +5,12 @@ import (
 	"fmt"
 )
 
+func pubUint128(b []byte, v uint128) {
+	_ = b[15]
+	binary.BigEndian.PutUint64(b[:8], v.lhs)
+	binary.BigEndian.PutUint64(b[8:], v.rhs)
+}
+
 func newUint128(in []byte) uint128 {
 	// TODO check length
 	l := binary.BigEndian.Uint64(in[:8])
