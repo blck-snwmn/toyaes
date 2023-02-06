@@ -6,6 +6,8 @@ import (
 )
 
 func Test_uint128_rightShiftx(t *testing.T) {
+	t.Parallel()
+
 	u := uint128{0x0000000000001123, 0x1234567890123456}
 	u = u.rightShift(16)
 	if !reflect.DeepEqual(u, uint128{0x0000000000000000, 0x1123123456789012}) {
@@ -14,6 +16,8 @@ func Test_uint128_rightShiftx(t *testing.T) {
 }
 
 func Test_uint128_rightShift(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		lhs uint64
 		rhs uint64
@@ -66,6 +70,8 @@ func Test_uint128_rightShift(t *testing.T) {
 }
 
 func Test_uint128_xor(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		lhs uint64
 		rhs uint64
@@ -109,6 +115,8 @@ func Test_uint128_xor(t *testing.T) {
 }
 
 func Test_uint128_and(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		lhs uint64
 		rhs uint64

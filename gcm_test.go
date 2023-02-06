@@ -10,6 +10,8 @@ import (
 )
 
 func Test_genCounter(t *testing.T) {
+	t.Parallel()
+
 	nonce := []byte{
 		0x00,
 		0x01,
@@ -49,6 +51,8 @@ func Test_genCounter(t *testing.T) {
 }
 
 func Test_incrementCounter(t *testing.T) {
+	t.Parallel()
+
 	nonce := []byte{
 		0x00,
 		0x01,
@@ -118,6 +122,8 @@ func Test_incrementCounter(t *testing.T) {
 }
 
 func Test_enc(t *testing.T) {
+	t.Parallel()
+
 	nonce := []byte{
 		0x00,
 		0xAA,
@@ -151,6 +157,8 @@ func Test_enc(t *testing.T) {
 }
 
 func Test_encWitchCounter(t *testing.T) {
+	t.Parallel()
+
 	nonce := []byte{
 		0x00,
 		0xAA,
@@ -188,6 +196,8 @@ func Test_encWitchCounter(t *testing.T) {
 }
 
 func Test_mulg(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		lhs uint128
 		rhs uint128
@@ -256,6 +266,8 @@ func Test_mulg(t *testing.T) {
 }
 
 func TestSeal(t *testing.T) {
+	t.Parallel()
+
 	var (
 		key            = make([]byte, 32)
 		plaintext      = make([]byte, 32)
@@ -283,6 +295,8 @@ func TestSeal(t *testing.T) {
 }
 
 func TestSealUsingGoAES(t *testing.T) {
+	t.Parallel()
+
 	var (
 		key            = make([]byte, 32)
 		plaintext      = make([]byte, 32)
@@ -311,6 +325,8 @@ func TestSealUsingGoAES(t *testing.T) {
 }
 
 func TestOpen(t *testing.T) {
+	t.Parallel()
+
 	var (
 		key            = make([]byte, 32)
 		plaintext      = make([]byte, 32)
@@ -336,6 +352,8 @@ func TestOpen(t *testing.T) {
 }
 
 func TestOpenUsingGoAES(t *testing.T) {
+	t.Parallel()
+
 	var (
 		key            = make([]byte, 32)
 		plaintext      = make([]byte, 32)
