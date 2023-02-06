@@ -26,11 +26,11 @@ func incrementCounter(counter [size]byte) [size]byte {
 	return counter
 }
 
-func enc(plaintext, key, nonce []byte) []byte {
-	return encWitchCounter(plaintext, key, nonce, genCounter(nonce))
+func (ta *toyAESGCM) enc(plaintext, nonce []byte) []byte {
+	return ta.encWitchCounter(plaintext, nonce, genCounter(nonce))
 }
 
-func encWitchCounter(plaintext, key, nonce []byte, c [16]byte) []byte {
+func (ta *toyAESGCM) encWitchCounter(plaintext, nonce []byte, c [16]byte) []byte {
 	blockNum, r := len(plaintext)/size, len(plaintext)%size
 	if r != 0 {
 		blockNum++
@@ -40,14 +40,12 @@ func encWitchCounter(plaintext, key, nonce []byte, c [16]byte) []byte {
 	ct := make([]byte, blockNum*size)
 	copy(ct, plaintext)
 
-	block := NewToyAES(key)
-
 	for i := 0; i < blockNum; i++ {
 		start, end := size*i, size*(i+1)
 		pt := ct[start:end]
 
 		var mask [size]byte
-		block.Encrypt(mask[:], c[:])
+		ta.cipher.Encrypt(mask[:], c[:])
 
 		out := make([]byte, len(pt))
 		subtle.XORBytes(out, pt, mask[:])
@@ -172,14 +170,14 @@ func (ta *toyAESGCM) Open(dst []byte, nonce []byte, ciphertext []byte, additiona
 	}
 
 	counter := incrementCounter(genCounter(nonce))
-	ct := encWitchCounter(ciphertext, ta.key, nonce, counter)
+	ct := ta.encWitchCounter(ciphertext, nonce, counter)
 	return ct, nil
 }
 
 // Seal implements cipher.AEAD
 func (ta *toyAESGCM) Seal(dst []byte, nonce []byte, plaintext []byte, additionalData []byte) []byte {
 	counter := incrementCounter(genCounter(nonce))
-	ct := encWitchCounter(plaintext, ta.key, nonce, counter)
+	ct := ta.encWitchCounter(plaintext, nonce, counter)
 
 	hk := make([]byte, 16)
 	ta.cipher.Encrypt(hk, make([]byte, 16))
