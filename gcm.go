@@ -95,12 +95,11 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 var _ ccipher.AEAD = (*toyAESGCM)(nil)
 
 func NewAESGCM(key []byte) ccipher.AEAD {
-	return &toyAESGCM{cipher: NewToyAES(key), key: key}
+	return &toyAESGCM{cipher: NewToyAES(key)}
 }
 
 type toyAESGCM struct {
 	cipher ccipher.Block
-	key    []byte
 }
 
 // NonceSize implements cipher.AEAD
