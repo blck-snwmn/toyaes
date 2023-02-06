@@ -109,7 +109,7 @@ func TestGoDecrypt_128bit(t *testing.T) {
 		gob.Decrypt(dstgo, src)
 
 		dstme := make([]byte, 16)
-		NewToyAES(key).Dencrypt(dstme, src)
+		NewToyAES(key).Decrypt(dstme, src)
 
 		if !reflect.DeepEqual(dstme, dstgo) {
 			t.Fatalf("got =%X, want=%X\n", dstme, dstgo)
@@ -131,7 +131,7 @@ func TestGoDecrypt_192bit(t *testing.T) {
 		gob.Decrypt(dstgo, src)
 
 		dstme := make([]byte, 16)
-		NewToyAES(key).Dencrypt(dstme, src)
+		NewToyAES(key).Decrypt(dstme, src)
 
 		if !reflect.DeepEqual(dstme, dstgo) {
 			t.Fatalf("got =%X, want=%X\n", dstme, dstgo)
@@ -153,7 +153,7 @@ func TestGoDecrypt_256bit(t *testing.T) {
 		gob.Decrypt(dstgo, src)
 
 		dstme := make([]byte, 16)
-		NewToyAES(key).Dencrypt(dstme, src)
+		NewToyAES(key).Decrypt(dstme, src)
 
 		if !reflect.DeepEqual(dstme, dstgo) {
 			t.Fatalf("got =%X, want=%X\n", dstme, dstgo)

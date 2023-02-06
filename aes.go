@@ -203,6 +203,6 @@ func (c *toyAES) Encrypt(dst, src []byte) {
 	cipher(src, dst, c.word)
 }
 
-func (c *toyAES) Dencrypt(dst, src []byte) {
+func (c *toyAES) Decrypt(dst, src []byte) {
 	invCipher(src, dst, c.word)
 }
