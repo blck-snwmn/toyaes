@@ -340,3 +340,36 @@ func TestCalcRcon(t *testing.T) {
 	x = mul(x, 0x02)
 	fmt.Printf("0x%02X\n", x)
 }
+
+func BenchmarkEncrypt(b *testing.B) {
+
+	key := make([]byte, 32)
+	plaintext := make([]byte, 16)
+	rand.Read(key)
+	rand.Read(plaintext)
+
+	ciphertext := make([]byte, 16)
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		t := NewToyAES(key)
+		t.Encrypt(ciphertext, plaintext)
+		t.Decrypt(plaintext, ciphertext)
+	}
+}
+
+func BenchmarkGoEncrypt(b *testing.B) {
+	key := make([]byte, 32)
+	plaintext := make([]byte, 16)
+	rand.Read(key)
+	rand.Read(plaintext)
+
+	ciphertext := make([]byte, 16)
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		gob, _ := aes.NewCipher(key)
+		gob.Encrypt(ciphertext, plaintext)
+		gob.Decrypt(plaintext, ciphertext)
+	}
+}
