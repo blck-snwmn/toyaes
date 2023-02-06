@@ -276,10 +276,10 @@ func TestSeal(t *testing.T) {
 	)
 
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(plaintext)
-		rand.Read(nonce)
-		rand.Read(additionalData)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(plaintext)
+		_, _ = rand.Read(nonce)
+		_, _ = rand.Read(additionalData)
 
 		aeadm := NewGCM(NewToyAES(key))
 		got := aeadm.Seal(nil, nonce, plaintext, additionalData)
@@ -305,10 +305,10 @@ func TestSealUsingGoAES(t *testing.T) {
 	)
 
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(plaintext)
-		rand.Read(nonce)
-		rand.Read(additionalData)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(plaintext)
+		_, _ = rand.Read(nonce)
+		_, _ = rand.Read(additionalData)
 
 		cb, _ := aes.NewCipher(key)
 		aeadm := NewGCM(cb)
@@ -334,10 +334,10 @@ func TestOpen(t *testing.T) {
 		additionalData = make([]byte, 12)
 	)
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(plaintext)
-		rand.Read(nonce)
-		rand.Read(additionalData)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(plaintext)
+		_, _ = rand.Read(nonce)
+		_, _ = rand.Read(additionalData)
 
 		aead := NewGCM(NewToyAES(key))
 		ciphertext := aead.Seal(nil, nonce, plaintext, additionalData)
@@ -361,10 +361,10 @@ func TestOpenUsingGoAES(t *testing.T) {
 		additionalData = make([]byte, 12)
 	)
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(plaintext)
-		rand.Read(nonce)
-		rand.Read(additionalData)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(plaintext)
+		_, _ = rand.Read(nonce)
+		_, _ = rand.Read(additionalData)
 
 		cb, _ := aes.NewCipher(key)
 		aead := NewGCM(cb)

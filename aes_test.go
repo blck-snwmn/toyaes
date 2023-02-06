@@ -39,8 +39,8 @@ func TestGoEncrypt_128bit(t *testing.T) {
 	key := make([]byte, 16)
 	src := make([]byte, 16)
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(src)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(src)
 
 		dstgo := make([]byte, 16)
 		gob, _ := aes.NewCipher(key)
@@ -61,8 +61,8 @@ func TestGoEncrypt_192bit(t *testing.T) {
 	key := make([]byte, 24)
 	src := make([]byte, 16)
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(src)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(src)
 
 		dstgo := make([]byte, 16)
 		gob, _ := aes.NewCipher(key)
@@ -83,8 +83,8 @@ func TestGoEncrypt_256bit(t *testing.T) {
 	key := make([]byte, 32)
 	src := make([]byte, 16)
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(src)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(src)
 
 		dstgo := make([]byte, 16)
 		gob, _ := aes.NewCipher(key)
@@ -105,8 +105,8 @@ func TestGoDecrypt_128bit(t *testing.T) {
 	key := make([]byte, 16)
 	src := make([]byte, 16)
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(src)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(src)
 
 		dstgo := make([]byte, 16)
 		gob, _ := aes.NewCipher(key)
@@ -127,8 +127,8 @@ func TestGoDecrypt_192bit(t *testing.T) {
 	key := make([]byte, 24)
 	src := make([]byte, 16)
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(src)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(src)
 
 		dstgo := make([]byte, 16)
 		gob, _ := aes.NewCipher(key)
@@ -149,8 +149,8 @@ func TestGoDecrypt_256bit(t *testing.T) {
 	key := make([]byte, 32)
 	src := make([]byte, 16)
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(src)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(src)
 
 		dstgo := make([]byte, 16)
 		gob, _ := aes.NewCipher(key)
@@ -274,10 +274,10 @@ func TestSealInToyAES(t *testing.T) {
 	)
 
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(plaintext)
-		rand.Read(nonce)
-		rand.Read(additionalData)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(plaintext)
+		_, _ = rand.Read(nonce)
+		_, _ = rand.Read(additionalData)
 
 		aeadme, _ := ccipher.NewGCM(NewToyAES(key))
 		got := aeadme.Seal(nil, nonce, plaintext, additionalData)
@@ -302,10 +302,10 @@ func TestOpenInToyAES(t *testing.T) {
 		additionalData = make([]byte, 12)
 	)
 	for i := 0; i < 1000; i++ {
-		rand.Read(key)
-		rand.Read(plaintext)
-		rand.Read(nonce)
-		rand.Read(additionalData)
+		_, _ = rand.Read(key)
+		_, _ = rand.Read(plaintext)
+		_, _ = rand.Read(nonce)
+		_, _ = rand.Read(additionalData)
 
 		aesb, _ := aes.NewCipher(key)
 		aeadgo, _ := ccipher.NewGCM(aesb)
@@ -358,8 +358,8 @@ func BenchmarkEncrypt(b *testing.B) {
 
 	key := make([]byte, 32)
 	plaintext := make([]byte, 16)
-	rand.Read(key)
-	rand.Read(plaintext)
+	_, _ = rand.Read(key)
+	_, _ = rand.Read(plaintext)
 
 	ciphertext := make([]byte, 16)
 	b.ResetTimer()
@@ -374,8 +374,8 @@ func BenchmarkEncrypt(b *testing.B) {
 func BenchmarkGoEncrypt(b *testing.B) {
 	key := make([]byte, 32)
 	plaintext := make([]byte, 16)
-	rand.Read(key)
-	rand.Read(plaintext)
+	_, _ = rand.Read(key)
+	_, _ = rand.Read(plaintext)
 
 	ciphertext := make([]byte, 16)
 	b.ResetTimer()
