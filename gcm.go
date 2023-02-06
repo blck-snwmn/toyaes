@@ -1,6 +1,7 @@
 package toyaes
 
 import (
+	ccipher "crypto/cipher"
 	"crypto/subtle"
 	"encoding/binary"
 	"errors"
@@ -178,4 +179,30 @@ func Open(ciphertext, key, nonce, additionalData []byte) ([]byte, error) {
 	counter := incrementCounter(genCounter(nonce))
 	ct := encWitchCounter(ciphertext, key, nonce, counter)
 	return ct, nil
+}
+
+var _ ccipher.AEAD = (*toyAESGCM)(nil)
+
+func NewAESGCM(key []byte) ccipher.AEAD {
+	return &toyAESGCM{key: key}
+}
+
+type toyAESGCM struct {
+	key []byte
+}
+
+// NonceSize implements cipher.AEAD
+func (*toyAESGCM) NonceSize() int { return 12 }
+
+// Overhead implements cipher.AEAD
+func (*toyAESGCM) Overhead() int { return 16 }
+
+// Open implements cipher.AEAD
+func (ta *toyAESGCM) Open(dst []byte, nonce []byte, ciphertext []byte, additionalData []byte) ([]byte, error) {
+	return Open(ciphertext, ta.key, nonce, additionalData)
+}
+
+// Seal implements cipher.AEAD
+func (ta *toyAESGCM) Seal(dst []byte, nonce []byte, plaintext []byte, additionalData []byte) []byte {
+	return Seal(plaintext, ta.key, nonce, additionalData)
 }
