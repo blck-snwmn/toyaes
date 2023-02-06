@@ -282,6 +282,34 @@ func TestSeal(t *testing.T) {
 	}
 }
 
+func TestSealUsingGoAES(t *testing.T) {
+	var (
+		key            = make([]byte, 32)
+		plaintext      = make([]byte, 32)
+		nonce          = make([]byte, 12)
+		additionalData = make([]byte, 12)
+	)
+
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(plaintext)
+		rand.Read(nonce)
+		rand.Read(additionalData)
+
+		cb, _ := aes.NewCipher(key)
+		aeadm := NewGCM(cb)
+		got := aeadm.Seal(nil, nonce, plaintext, additionalData)
+
+		aesb, _ := aes.NewCipher(key)
+		aead, _ := ccipher.NewGCM(aesb)
+		want := aead.Seal(nil, nonce, plaintext, additionalData)
+
+		if !reflect.DeepEqual(got, want) {
+			t.Fatalf("got =%X, want=%X\n", got, want)
+		}
+	}
+}
+
 func TestOpen(t *testing.T) {
 	var (
 		key            = make([]byte, 32)
@@ -296,6 +324,32 @@ func TestOpen(t *testing.T) {
 		rand.Read(additionalData)
 
 		aead := NewGCM(NewToyAES(key))
+		ciphertext := aead.Seal(nil, nonce, plaintext, additionalData)
+		p, err := aead.Open(nil, nonce, ciphertext, additionalData)
+		if err != nil {
+			t.Fatalf("err=%+v", err)
+		}
+		if !reflect.DeepEqual(p, plaintext) {
+			t.Fatalf("got =%X, want=%X\n", p, plaintext)
+		}
+	}
+}
+
+func TestOpenUsingGoAES(t *testing.T) {
+	var (
+		key            = make([]byte, 32)
+		plaintext      = make([]byte, 32)
+		nonce          = make([]byte, 12)
+		additionalData = make([]byte, 12)
+	)
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(plaintext)
+		rand.Read(nonce)
+		rand.Read(additionalData)
+
+		cb, _ := aes.NewCipher(key)
+		aead := NewGCM(cb)
 		ciphertext := aead.Seal(nil, nonce, plaintext, additionalData)
 		p, err := aead.Open(nil, nonce, ciphertext, additionalData)
 		if err != nil {
