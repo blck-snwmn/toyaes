@@ -91,24 +91,24 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 	return hashed
 }
 
-var _ ccipher.AEAD = (*toyAESGCM)(nil)
+var _ ccipher.AEAD = (*toyGCM)(nil)
 
 func NewAESGCM(key []byte) ccipher.AEAD {
-	return &toyAESGCM{cipher: NewToyAES(key)}
+	return &toyGCM{cipher: NewToyAES(key)}
 }
 
-type toyAESGCM struct {
+type toyGCM struct {
 	cipher ccipher.Block
 }
 
 // NonceSize implements cipher.AEAD
-func (*toyAESGCM) NonceSize() int { return 12 }
+func (*toyGCM) NonceSize() int { return 12 }
 
 // Overhead implements cipher.AEAD
-func (*toyAESGCM) Overhead() int { return 16 }
+func (*toyGCM) Overhead() int { return 16 }
 
 // Open implements cipher.AEAD
-func (ta *toyAESGCM) Open(dst []byte, nonce []byte, ciphertext []byte, additionalData []byte) ([]byte, error) {
+func (ta *toyGCM) Open(dst []byte, nonce []byte, ciphertext []byte, additionalData []byte) ([]byte, error) {
 	tags := ciphertext[len(ciphertext)-16:]
 	ciphertext = ciphertext[:len(ciphertext)-16]
 
@@ -134,7 +134,7 @@ func (ta *toyAESGCM) Open(dst []byte, nonce []byte, ciphertext []byte, additiona
 }
 
 // Seal implements cipher.AEAD
-func (ta *toyAESGCM) Seal(dst []byte, nonce []byte, plaintext []byte, additionalData []byte) []byte {
+func (ta *toyGCM) Seal(dst []byte, nonce []byte, plaintext []byte, additionalData []byte) []byte {
 	counter := incrementCounter(genCounter(nonce))
 	ct := ta.encWitchCounter(plaintext, nonce, counter)
 
@@ -154,11 +154,11 @@ func (ta *toyAESGCM) Seal(dst []byte, nonce []byte, plaintext []byte, additional
 	return ct
 }
 
-func (ta *toyAESGCM) enc(plaintext, nonce []byte) []byte {
+func (ta *toyGCM) enc(plaintext, nonce []byte) []byte {
 	return ta.encWitchCounter(plaintext, nonce, genCounter(nonce))
 }
 
-func (ta *toyAESGCM) encWitchCounter(plaintext, nonce []byte, c [16]byte) []byte {
+func (ta *toyGCM) encWitchCounter(plaintext, nonce []byte, c [16]byte) []byte {
 	blockNum, r := len(plaintext)/size, len(plaintext)%size
 	if r != 0 {
 		blockNum++
