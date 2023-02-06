@@ -26,38 +26,6 @@ func incrementCounter(counter [size]byte) [size]byte {
 	return counter
 }
 
-func (ta *toyAESGCM) enc(plaintext, nonce []byte) []byte {
-	return ta.encWitchCounter(plaintext, nonce, genCounter(nonce))
-}
-
-func (ta *toyAESGCM) encWitchCounter(plaintext, nonce []byte, c [16]byte) []byte {
-	blockNum, r := len(plaintext)/size, len(plaintext)%size
-	if r != 0 {
-		blockNum++
-	}
-	// plaintext は `size` の倍数であるとは限らないため、
-	// plaintext より大きい倍数になるものを暗号化対象にする
-	ct := make([]byte, blockNum*size)
-	copy(ct, plaintext)
-
-	for i := 0; i < blockNum; i++ {
-		start, end := size*i, size*(i+1)
-		pt := ct[start:end]
-
-		var mask [size]byte
-		ta.cipher.Encrypt(mask[:], c[:])
-
-		out := make([]byte, len(pt))
-		subtle.XORBytes(out, pt, mask[:])
-		copy(ct[start:end], out)
-
-		c = incrementCounter(c)
-	}
-	// 事前にもともとの `plaintext`より大きいサイズになっている可能性があるので、削る
-	// 暗号化前後でバイト列の長さは変わらない
-	return ct[:len(plaintext)]
-}
-
 // 00100001
 // x^7 + x^2 + x + 1
 var max128 uint128 = uint128{
@@ -193,4 +161,36 @@ func (ta *toyAESGCM) Seal(dst []byte, nonce []byte, plaintext []byte, additional
 
 	ct = append(ct, tags[:]...)
 	return ct
+}
+
+func (ta *toyAESGCM) enc(plaintext, nonce []byte) []byte {
+	return ta.encWitchCounter(plaintext, nonce, genCounter(nonce))
+}
+
+func (ta *toyAESGCM) encWitchCounter(plaintext, nonce []byte, c [16]byte) []byte {
+	blockNum, r := len(plaintext)/size, len(plaintext)%size
+	if r != 0 {
+		blockNum++
+	}
+	// plaintext は `size` の倍数であるとは限らないため、
+	// plaintext より大きい倍数になるものを暗号化対象にする
+	ct := make([]byte, blockNum*size)
+	copy(ct, plaintext)
+
+	for i := 0; i < blockNum; i++ {
+		start, end := size*i, size*(i+1)
+		pt := ct[start:end]
+
+		var mask [size]byte
+		ta.cipher.Encrypt(mask[:], c[:])
+
+		out := make([]byte, len(pt))
+		subtle.XORBytes(out, pt, mask[:])
+		copy(ct[start:end], out)
+
+		c = incrementCounter(c)
+	}
+	// 事前にもともとの `plaintext`より大きいサイズになっている可能性があるので、削る
+	// 暗号化前後でバイト列の長さは変わらない
+	return ct[:len(plaintext)]
 }
