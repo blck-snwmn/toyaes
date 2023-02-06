@@ -133,7 +133,7 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 	return hashed
 }
 
-func Seal(plaintext, key, nonce, additionalData []byte) []byte {
+func seal(plaintext, key, nonce, additionalData []byte) []byte {
 	counter := incrementCounter(genCounter(nonce))
 	ct := encWitchCounter(plaintext, key, nonce, counter)
 
@@ -154,7 +154,7 @@ func Seal(plaintext, key, nonce, additionalData []byte) []byte {
 	return ct
 }
 
-func Open(ciphertext, key, nonce, additionalData []byte) ([]byte, error) {
+func open(ciphertext, key, nonce, additionalData []byte) ([]byte, error) {
 
 	tags := ciphertext[len(ciphertext)-16:]
 	ciphertext = ciphertext[:len(ciphertext)-16]
@@ -199,10 +199,10 @@ func (*toyAESGCM) Overhead() int { return 16 }
 
 // Open implements cipher.AEAD
 func (ta *toyAESGCM) Open(dst []byte, nonce []byte, ciphertext []byte, additionalData []byte) ([]byte, error) {
-	return Open(ciphertext, ta.key, nonce, additionalData)
+	return open(ciphertext, ta.key, nonce, additionalData)
 }
 
 // Seal implements cipher.AEAD
 func (ta *toyAESGCM) Seal(dst []byte, nonce []byte, plaintext []byte, additionalData []byte) []byte {
-	return Seal(plaintext, ta.key, nonce, additionalData)
+	return seal(plaintext, ta.key, nonce, additionalData)
 }

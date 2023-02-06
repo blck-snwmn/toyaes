@@ -266,7 +266,8 @@ func TestSeal(t *testing.T) {
 		rand.Read(nonce)
 		rand.Read(additionalData)
 
-		got := Seal(plaintext, key, nonce, additionalData)
+		aeadm := NewAESGCM(key)
+		got := aeadm.Seal(nil, nonce, plaintext, additionalData)
 
 		aesb, _ := aes.NewCipher(key)
 		aead, _ := ccipher.NewGCM(aesb)
@@ -291,9 +292,9 @@ func TestOpen(t *testing.T) {
 		rand.Read(nonce)
 		rand.Read(additionalData)
 
-		got := Seal(plaintext, key, nonce, additionalData)
-
-		p, err := Open(got, key, nonce, additionalData)
+		aead := NewAESGCM(key)
+		ciphertext := aead.Seal(nil, nonce, plaintext, additionalData)
+		p, err := aead.Open(nil, nonce, ciphertext, additionalData)
 		if err != nil {
 			t.Fatalf("err=%+v", err)
 		}
