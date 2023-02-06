@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	ccipher "crypto/cipher"
 	"crypto/rand"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -304,4 +305,38 @@ func TestOpenInToyAES(t *testing.T) {
 			t.Fatalf("got =%X, want=%X\n", got, plaintext)
 		}
 	}
+}
+
+func TestCalcRcon(t *testing.T) {
+	t.Skip()
+
+	fmt.Printf("0x%02X\n", 0x01)
+	x := mul(0x02, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
+	x = mul(x, 0x02)
+	fmt.Printf("0x%02X\n", x)
 }
