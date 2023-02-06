@@ -185,7 +185,7 @@ type toyAES struct {
 // BlockSize implements cipher.Block
 func (*toyAES) BlockSize() int { return 16 }
 
-func NewToyAES(key []byte) *toyAES {
+func NewToyAES(key []byte) ccipher.Block {
 	nk := len(key) / 4 // 4,6,8
 	var nr int
 	switch nk {
