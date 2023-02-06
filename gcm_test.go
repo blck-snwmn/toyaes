@@ -134,7 +134,7 @@ func Test_enc(t *testing.T) {
 	}
 	plaintext := []byte("sample text. this text is test text.")
 	key, _ := hex.DecodeString("000102030405060708090A0B0C0E0F101112131415161718191A1B1C1E1F2021")
-	gcm := NewAESGCM(key)
+	gcm := NewGCM(key)
 	ct := gcm.(*toyGCM).enc(plaintext, nonce)
 
 	block, err := aes.NewCipher(key)
@@ -170,7 +170,7 @@ func Test_encWitchCounter(t *testing.T) {
 	cc := genCounter(nonce)
 	incrementCounter(cc)
 
-	gcm := NewAESGCM(key)
+	gcm := NewGCM(key)
 	ct := gcm.(*toyGCM).encWitchCounter(plaintext, nonce, cc)
 
 	block, err := aes.NewCipher(key)
@@ -269,7 +269,7 @@ func TestSeal(t *testing.T) {
 		rand.Read(nonce)
 		rand.Read(additionalData)
 
-		aeadm := NewAESGCM(key)
+		aeadm := NewGCM(key)
 		got := aeadm.Seal(nil, nonce, plaintext, additionalData)
 
 		aesb, _ := aes.NewCipher(key)
@@ -295,7 +295,7 @@ func TestOpen(t *testing.T) {
 		rand.Read(nonce)
 		rand.Read(additionalData)
 
-		aead := NewAESGCM(key)
+		aead := NewGCM(key)
 		ciphertext := aead.Seal(nil, nonce, plaintext, additionalData)
 		p, err := aead.Open(nil, nonce, ciphertext, additionalData)
 		if err != nil {
