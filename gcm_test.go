@@ -134,10 +134,8 @@ func Test_enc(t *testing.T) {
 	}
 	plaintext := []byte("sample text. this text is test text.")
 	key, _ := hex.DecodeString("000102030405060708090A0B0C0E0F101112131415161718191A1B1C1E1F2021")
-	ct, err := enc(plaintext, key, nonce)
-	if err != nil {
-		panic(err.Error())
-	}
+	ct := enc(plaintext, key, nonce)
+
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err.Error())
@@ -170,10 +168,8 @@ func Test_encWitchCounter(t *testing.T) {
 	key, _ := hex.DecodeString("000102030405060708090A0B0C0E0F101112131415161718191A1B1C1E1F2021")
 	cc := genCounter(nonce)
 	incrementCounter(cc)
-	ct, err := encWitchCounter(plaintext, key, nonce, cc)
-	if err != nil {
-		panic(err.Error())
-	}
+	ct := encWitchCounter(plaintext, key, nonce, cc)
+
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err.Error())
@@ -270,10 +266,8 @@ func TestSeal(t *testing.T) {
 		rand.Read(nonce)
 		rand.Read(additionalData)
 
-		got, err := Seal(plaintext, key, nonce, additionalData)
-		if err != nil {
-			t.Fatalf("err=%+v", err)
-		}
+		got := Seal(plaintext, key, nonce, additionalData)
+
 		aesb, _ := aes.NewCipher(key)
 		aead, _ := ccipher.NewGCM(aesb)
 		want := aead.Seal(nil, nonce, plaintext, additionalData)
@@ -297,10 +291,8 @@ func TestOpen(t *testing.T) {
 		rand.Read(nonce)
 		rand.Read(additionalData)
 
-		got, err := Seal(plaintext, key, nonce, additionalData)
-		if err != nil {
-			t.Fatalf("err=%+v", err)
-		}
+		got := Seal(plaintext, key, nonce, additionalData)
+
 		p, err := Open(got, key, nonce, additionalData)
 		if err != nil {
 			t.Fatalf("err=%+v", err)

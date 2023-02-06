@@ -25,11 +25,11 @@ func incrementCounter(counter [size]byte) [size]byte {
 	return counter
 }
 
-func enc(plaintext, key, nonce []byte) ([]byte, error) {
+func enc(plaintext, key, nonce []byte) []byte {
 	return encWitchCounter(plaintext, key, nonce, genCounter(nonce))
 }
 
-func encWitchCounter(plaintext, key, nonce []byte, c [16]byte) ([]byte, error) {
+func encWitchCounter(plaintext, key, nonce []byte, c [16]byte) []byte {
 	blockNum, r := len(plaintext)/size, len(plaintext)%size
 	if r != 0 {
 		blockNum++
@@ -56,7 +56,7 @@ func encWitchCounter(plaintext, key, nonce []byte, c [16]byte) ([]byte, error) {
 	}
 	// 事前にもともとの `plaintext`より大きいサイズになっている可能性があるので、削る
 	// 暗号化前後でバイト列の長さは変わらない
-	return ct[:len(plaintext)], nil
+	return ct[:len(plaintext)]
 }
 
 // 00100001
@@ -132,12 +132,9 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 	return hashed
 }
 
-func Seal(plaintext, key, nonce, additionalData []byte) ([]byte, error) {
+func Seal(plaintext, key, nonce, additionalData []byte) []byte {
 	counter := incrementCounter(genCounter(nonce))
-	ct, err := encWitchCounter(plaintext, key, nonce, counter)
-	if err != nil {
-		return nil, err
-	}
+	ct := encWitchCounter(plaintext, key, nonce, counter)
 
 	block := NewToyAES(key)
 	hk := make([]byte, 16)
@@ -153,7 +150,7 @@ func Seal(plaintext, key, nonce, additionalData []byte) ([]byte, error) {
 	subtle.XORBytes(tags, encryptedCounter[:], hash[:])
 
 	ct = append(ct, tags[:]...)
-	return ct, nil
+	return ct
 }
 
 func Open(ciphertext, key, nonce, additionalData []byte) ([]byte, error) {
@@ -179,10 +176,6 @@ func Open(ciphertext, key, nonce, additionalData []byte) ([]byte, error) {
 	}
 
 	counter := incrementCounter(genCounter(nonce))
-	ct, err := encWitchCounter(ciphertext, key, nonce, counter)
-	if err != nil {
-		return nil, err
-	}
-
+	ct := encWitchCounter(ciphertext, key, nonce, counter)
 	return ct, nil
 }
