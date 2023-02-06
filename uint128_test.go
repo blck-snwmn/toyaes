@@ -1,17 +1,9 @@
 package toyaes
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
-
-func Test_do(t *testing.T) {
-	u := uint128{0x8000000000000000, 0x0000000000000000}
-	fmt.Println(u)
-	u = u.rightShift(127)
-	fmt.Println(u)
-}
 
 func Test_uint128_rightShiftx(t *testing.T) {
 	u := uint128{0x0000000000001123, 0x1234567890123456}
