@@ -15,4 +15,4 @@ jobs:
           go-version-file: "go.mod"
       - name: Run test
         run: |
-          go test ./...
+          go test ./... --shuffle on
