@@ -71,13 +71,6 @@ func split(in []byte) <-chan uint128 {
 	return ch
 }
 
-func newUint128(in []byte) uint128 {
-	// TODO check length
-	l := binary.BigEndian.Uint64(in[:8])
-	r := binary.BigEndian.Uint64(in[8:])
-	return uint128{l, r}
-}
-
 func ghash(cipherText, additionalData, hk []byte) [16]byte {
 	h := newUint128(hk)
 	var x uint128

@@ -1,6 +1,16 @@
 package toyaes
 
-import "fmt"
+import (
+	"encoding/binary"
+	"fmt"
+)
+
+func newUint128(in []byte) uint128 {
+	// TODO check length
+	l := binary.BigEndian.Uint64(in[:8])
+	r := binary.BigEndian.Uint64(in[8:])
+	return uint128{l, r}
+}
 
 type uint128 struct {
 	lhs, rhs uint64
