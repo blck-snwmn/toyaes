@@ -22,7 +22,7 @@ func incrementCounter(counter [size]byte) [size]byte {
 	// 残り4バイトのカウントを増やす
 	c := counter[size-4:]
 	binary.BigEndian.PutUint32(c, binary.BigEndian.Uint32(c)+1)
-	copy(counter[size-4:], c)
+	// copy(counter[size-4:], c)
 	return counter
 }
 
