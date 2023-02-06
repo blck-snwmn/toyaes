@@ -93,8 +93,8 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 
 var _ ccipher.AEAD = (*toyGCM)(nil)
 
-func NewGCM(key []byte) ccipher.AEAD {
-	return &toyGCM{cipher: NewToyAES(key)}
+func NewGCM(cipher ccipher.Block) ccipher.AEAD {
+	return &toyGCM{cipher: cipher}
 }
 
 type toyGCM struct {
