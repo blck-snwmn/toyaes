@@ -2,6 +2,7 @@ package toyaes
 
 import (
 	"crypto/aes"
+	ccipher "crypto/cipher"
 	"crypto/rand"
 	"reflect"
 	"testing"
@@ -249,5 +250,58 @@ func TestCipherExample(t *testing.T) {
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("invalid cipher text. got=%v, want=%v.", got, want)
+	}
+}
+
+func TestSealInToyAES(t *testing.T) {
+	var (
+		key            = make([]byte, 32)
+		plaintext      = make([]byte, 32)
+		nonce          = make([]byte, 12)
+		additionalData = make([]byte, 12)
+	)
+
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(plaintext)
+		rand.Read(nonce)
+		rand.Read(additionalData)
+
+		aeadme, _ := ccipher.NewGCM(NewToyAES(key))
+		got := aeadme.Seal(nil, nonce, plaintext, additionalData)
+
+		aesb, _ := aes.NewCipher(key)
+		aeadgo, _ := ccipher.NewGCM(aesb)
+		want := aeadgo.Seal(nil, nonce, plaintext, additionalData)
+
+		if !reflect.DeepEqual(got, want) {
+			t.Fatalf("got =%X, want=%X\n", got, want)
+		}
+	}
+}
+
+func TestOpenInToyAES(t *testing.T) {
+	var (
+		key            = make([]byte, 32)
+		plaintext      = make([]byte, 32)
+		nonce          = make([]byte, 12)
+		additionalData = make([]byte, 12)
+	)
+	for i := 0; i < 1000; i++ {
+		rand.Read(key)
+		rand.Read(plaintext)
+		rand.Read(nonce)
+		rand.Read(additionalData)
+
+		aesb, _ := aes.NewCipher(key)
+		aeadgo, _ := ccipher.NewGCM(aesb)
+		ciphertext := aeadgo.Seal(nil, nonce, plaintext, additionalData)
+
+		aeadme, _ := ccipher.NewGCM(NewToyAES(key))
+		got, _ := aeadme.Open(nil, nonce, ciphertext, additionalData)
+
+		if !reflect.DeepEqual(got, plaintext) {
+			t.Fatalf("got =%X, want=%X\n", got, plaintext)
+		}
 	}
 }
