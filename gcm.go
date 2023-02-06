@@ -133,62 +133,15 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 	return hashed
 }
 
-func seal(plaintext, key, nonce, additionalData []byte) []byte {
-	counter := incrementCounter(genCounter(nonce))
-	ct := encWitchCounter(plaintext, key, nonce, counter)
-
-	block := NewToyAES(key)
-	hk := make([]byte, 16)
-	block.Encrypt(hk, make([]byte, 16))
-
-	hash := ghash(ct, additionalData, hk)
-
-	encryptedCounter := make([]byte, 16)
-	c := genCounter(nonce)
-	block.Encrypt(encryptedCounter, c[:])
-
-	tags := make([]byte, len(encryptedCounter[:]))
-	subtle.XORBytes(tags, encryptedCounter[:], hash[:])
-
-	ct = append(ct, tags[:]...)
-	return ct
-}
-
-func open(ciphertext, key, nonce, additionalData []byte) ([]byte, error) {
-
-	tags := ciphertext[len(ciphertext)-16:]
-	ciphertext = ciphertext[:len(ciphertext)-16]
-
-	block := NewToyAES(key)
-	hk := make([]byte, 16)
-	block.Encrypt(hk, make([]byte, 16))
-
-	hash := ghash(ciphertext, additionalData, hk)
-
-	encryptedCounter := make([]byte, 16)
-	c := genCounter(nonce)
-	block.Encrypt(encryptedCounter, c[:])
-
-	expectedTags := make([]byte, len(encryptedCounter[:]))
-	subtle.XORBytes(expectedTags, encryptedCounter[:], hash[:])
-
-	if subtle.ConstantTimeCompare(expectedTags, tags) != 1 {
-		return nil, errors.New("invalid tags")
-	}
-
-	counter := incrementCounter(genCounter(nonce))
-	ct := encWitchCounter(ciphertext, key, nonce, counter)
-	return ct, nil
-}
-
 var _ ccipher.AEAD = (*toyAESGCM)(nil)
 
 func NewAESGCM(key []byte) ccipher.AEAD {
-	return &toyAESGCM{key: key}
+	return &toyAESGCM{cipher: NewToyAES(key), key: key}
 }
 
 type toyAESGCM struct {
-	key []byte
+	cipher ccipher.Block
+	key    []byte
 }
 
 // NonceSize implements cipher.AEAD
@@ -199,10 +152,47 @@ func (*toyAESGCM) Overhead() int { return 16 }
 
 // Open implements cipher.AEAD
 func (ta *toyAESGCM) Open(dst []byte, nonce []byte, ciphertext []byte, additionalData []byte) ([]byte, error) {
-	return open(ciphertext, ta.key, nonce, additionalData)
+	tags := ciphertext[len(ciphertext)-16:]
+	ciphertext = ciphertext[:len(ciphertext)-16]
+
+	hk := make([]byte, 16)
+	ta.cipher.Encrypt(hk, make([]byte, 16))
+
+	hash := ghash(ciphertext, additionalData, hk)
+
+	encryptedCounter := make([]byte, 16)
+	c := genCounter(nonce)
+	ta.cipher.Encrypt(encryptedCounter, c[:])
+
+	expectedTags := make([]byte, len(encryptedCounter[:]))
+	subtle.XORBytes(expectedTags, encryptedCounter[:], hash[:])
+
+	if subtle.ConstantTimeCompare(expectedTags, tags) != 1 {
+		return nil, errors.New("invalid tags")
+	}
+
+	counter := incrementCounter(genCounter(nonce))
+	ct := encWitchCounter(ciphertext, ta.key, nonce, counter)
+	return ct, nil
 }
 
 // Seal implements cipher.AEAD
 func (ta *toyAESGCM) Seal(dst []byte, nonce []byte, plaintext []byte, additionalData []byte) []byte {
-	return seal(plaintext, ta.key, nonce, additionalData)
+	counter := incrementCounter(genCounter(nonce))
+	ct := encWitchCounter(plaintext, ta.key, nonce, counter)
+
+	hk := make([]byte, 16)
+	ta.cipher.Encrypt(hk, make([]byte, 16))
+
+	hash := ghash(ct, additionalData, hk)
+
+	encryptedCounter := make([]byte, 16)
+	c := genCounter(nonce)
+	ta.cipher.Encrypt(encryptedCounter, c[:])
+
+	tags := make([]byte, len(encryptedCounter[:]))
+	subtle.XORBytes(tags, encryptedCounter[:], hash[:])
+
+	ct = append(ct, tags[:]...)
+	return ct
 }
