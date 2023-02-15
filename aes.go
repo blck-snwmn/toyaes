@@ -3,6 +3,7 @@ package toyaes
 import (
 	ccipher "crypto/cipher"
 	"encoding/binary"
+	"fmt"
 )
 
 // Kb: word number (paintext)
@@ -35,20 +36,40 @@ func invShiftRows(state []byte) {
 	state[3], state[7], state[11], state[15] = state[7], state[11], state[15], state[3]
 }
 
+func Mul(x, y byte) byte {
+	return mul(x, y)
+}
+
 func mul(x, y byte) byte {
-	sum := byte(0)
-	for i := 0; i < 8; i++ {
-		if y&1 == 1 {
-			sum ^= x // add
-		}
-		msb := x & 0x80
-		x <<= 1
-		if msb == 0x80 {
-			x ^= 0x1b // add
-		}
-		y >>= 1
+	switch x {
+	case 0x02:
+		return mul0x02[y]
+	case 0x03:
+		return mul0x03[y]
+	case 0x0e:
+		return mul0x0e[y]
+	case 0x0b:
+		return mul0x0b[y]
+	case 0x0d:
+		return mul0x0d[y]
+	case 0x09:
+		return mul0x09[y]
+	default:
+		panic(fmt.Sprintf("invalid input: %X", x))
 	}
-	return sum
+	// sum := byte(0)
+	// for i := 0; i < 8; i++ {
+	// 	if y&1 == 1 {
+	// 		sum ^= x // add
+	// 	}
+	// 	msb := x & 0x80
+	// 	x <<= 1
+	// 	if msb == 0x80 {
+	// 		x ^= 0x1b // add
+	// 	}
+	// 	y >>= 1
+	// }
+	// return sum
 }
 
 func mixColumns(state []byte) {
