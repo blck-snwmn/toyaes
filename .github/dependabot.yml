@@ -6,10 +6,18 @@
 version: 2
 updates:
   - package-ecosystem: "gomod" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
