@@ -82,8 +82,8 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 	}
 
 	x = mulg(add(x, uint128{
-		uint64(len(additionalData) * 8),
-		uint64(len(cipherText) * 8),
+		uint64(len(additionalData)) * 8,
+		uint64(len(cipherText)) * 8,
 	}), h)
 
 	var hashed [16]byte
