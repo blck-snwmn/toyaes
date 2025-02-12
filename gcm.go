@@ -158,7 +158,7 @@ func (ta *toyGCM) enc(plaintext, nonce []byte) []byte {
 	return ta.encWitchCounter(plaintext, nonce, genCounter(nonce))
 }
 
-func (ta *toyGCM) encWitchCounter(plaintext, nonce []byte, c [16]byte) []byte {
+func (ta *toyGCM) encWitchCounter(plaintext, _ []byte, c [16]byte) []byte {
 	blockNum, r := len(plaintext)/size, len(plaintext)%size
 	if r != 0 {
 		blockNum++
