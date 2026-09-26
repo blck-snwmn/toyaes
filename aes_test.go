@@ -39,7 +39,7 @@ func TestGoEncrypt_128bit(t *testing.T) {
 
 	key := make([]byte, 16)
 	src := make([]byte, 16)
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		_, _ = rand.Read(key)
 		_, _ = rand.Read(src)
 
@@ -61,7 +61,7 @@ func TestGoEncrypt_192bit(t *testing.T) {
 
 	key := make([]byte, 24)
 	src := make([]byte, 16)
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		_, _ = rand.Read(key)
 		_, _ = rand.Read(src)
 
@@ -83,7 +83,7 @@ func TestGoEncrypt_256bit(t *testing.T) {
 
 	key := make([]byte, 32)
 	src := make([]byte, 16)
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		_, _ = rand.Read(key)
 		_, _ = rand.Read(src)
 
@@ -105,7 +105,7 @@ func TestGoDecrypt_128bit(t *testing.T) {
 
 	key := make([]byte, 16)
 	src := make([]byte, 16)
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		_, _ = rand.Read(key)
 		_, _ = rand.Read(src)
 
@@ -127,7 +127,7 @@ func TestGoDecrypt_192bit(t *testing.T) {
 
 	key := make([]byte, 24)
 	src := make([]byte, 16)
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		_, _ = rand.Read(key)
 		_, _ = rand.Read(src)
 
@@ -149,7 +149,7 @@ func TestGoDecrypt_256bit(t *testing.T) {
 
 	key := make([]byte, 32)
 	src := make([]byte, 16)
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		_, _ = rand.Read(key)
 		_, _ = rand.Read(src)
 
@@ -274,7 +274,7 @@ func TestSealInToyAES(t *testing.T) {
 		additionalData = make([]byte, 12)
 	)
 
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		_, _ = rand.Read(key)
 		_, _ = rand.Read(plaintext)
 		_, _ = rand.Read(nonce)
@@ -302,7 +302,7 @@ func TestOpenInToyAES(t *testing.T) {
 		nonce          = make([]byte, 12)
 		additionalData = make([]byte, 12)
 	)
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		_, _ = rand.Read(key)
 		_, _ = rand.Read(plaintext)
 		_, _ = rand.Read(nonce)

@@ -13,13 +13,13 @@ import (
 // input is 4*4 byte
 
 func subBytes(state []byte) {
-	for i := 0; i < len(state); i++ {
+	for i := range state {
 		state[i] = sbox[state[i]]
 	}
 }
 
 func invSubBytes(state []byte) {
-	for i := 0; i < len(state); i++ {
+	for i := range state {
 		state[i] = isbox[state[i]]
 	}
 }
@@ -75,7 +75,7 @@ func mul(x, y byte) byte {
 func mixColumns(state []byte) {
 	tmp := make([]byte, 16)
 	// add is xor
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		tmp[i*4] = mul(0x02, state[i*4]) ^ mul(0x03, state[i*4+1]) ^ state[i*4+2] ^ state[i*4+3]
 		tmp[i*4+1] = state[i*4] ^ mul(0x02, state[i*4+1]) ^ mul(0x03, state[i*4+2]) ^ state[i*4+3]
 		tmp[i*4+2] = state[i*4] ^ state[i*4+1] ^ mul(0x02, state[i*4+2]) ^ mul(0x03, state[i*4+3])
@@ -87,7 +87,7 @@ func mixColumns(state []byte) {
 func invMixColumns(state []byte) {
 	tmp := make([]byte, 16)
 	// add is xor
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		tmp[i*4] = mul(0x0e, state[i*4]) ^ mul(0x0b, state[i*4+1]) ^ mul(0x0d, state[i*4+2]) ^ mul(0x09, state[i*4+3])
 		tmp[i*4+1] = mul(0x09, state[i*4]) ^ mul(0x0e, state[i*4+1]) ^ mul(0x0b, state[i*4+2]) ^ mul(0x0d, state[i*4+3])
 		tmp[i*4+2] = mul(0x0d, state[i*4]) ^ mul(0x09, state[i*4+1]) ^ mul(0x0e, state[i*4+2]) ^ mul(0x0b, state[i*4+3])
@@ -102,7 +102,7 @@ func addRoundKey(state []byte, word []uint32) {
 	binary.BigEndian.PutUint32(addrktmp[4:8], word[1])
 	binary.BigEndian.PutUint32(addrktmp[8:12], word[2])
 	binary.BigEndian.PutUint32(addrktmp[12:16], word[3])
-	for i := 0; i < len(state); i++ {
+	for i := range state {
 		state[i] ^= addrktmp[i]
 	}
 }
@@ -177,7 +177,7 @@ func subWord(w uint32) uint32 {
 
 func keyExpansion(key []byte, word []uint32) {
 	nk := len(key) / 4 // 4,6,8
-	for i := 0; i < nk; i++ {
+	for i := range nk {
 		word[i] = binary.BigEndian.Uint32(key[4*i : 4*(i+1)])
 	}
 	nr := nr(word)
